@@ -1,7 +1,7 @@
 var config = {
-	width: 800,
-	height: 600,
-	backgroundColor: 0x000000,
+	width: 640,
+	height: window.innerHeight,
+	backgroundColor: 0xe63946,
 	scene: [Title, Game],
 };
 

@@ -4,7 +4,7 @@ class Game extends Phaser.Scene {
 	}
 
 	create() {
-		this.add.text(20, 20, "loading game...");
-		this.Scene.start("playGame");
+		this.add.text(50, 20, "loading game...");
+		// this.Scene.start("playGame");
 	}
 }
