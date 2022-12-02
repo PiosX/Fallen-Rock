@@ -1,6 +1,6 @@
 class Title extends Phaser.Scene {
 	constructor() {
-		super("playGame");
+		super("bootGame");
 	}
 
 	preload() {
@@ -39,10 +39,10 @@ class Title extends Phaser.Scene {
 			})
 			.setOrigin(-2.85, -0.8);
 
-		this.settings = this.add.image(20, 20, "settings");
-		this.settings.setOrigin(0, 0);
-		this.settings.setDepth(1);
-		this.settings.setInteractive({ cursor: "pointer" });
+		const settings = this.add.image(20, 20, "settings");
+		settings.setOrigin(0, 0);
+		settings.setDepth(2);
+		settings.setInteractive({ cursor: "pointer" });
 
 		this.score = this.add.image(config.width / 2 - 75, 0, "score");
 		this.score.setOrigin(0, -10.3);
@@ -57,13 +57,10 @@ class Title extends Phaser.Scene {
 			})
 			.setOrigin(-4.9, -10.1);
 
-		this.hero = this.add.circle(
-			config.width / 2,
-			config.height / 2 + 130,
-			35,
-			"0xffffff"
-		);
-		this.make
+		const hero = this.add
+			.circle(config.width / 2, config.height / 2 + 130, 35, "0xffffff")
+			.setInteractive();
+		const start = this.make
 			.text({
 				text: "Tap to start",
 				style: {
@@ -73,22 +70,60 @@ class Title extends Phaser.Scene {
 			})
 			.setOrigin(-2.2, -26.5);
 
-		this.circle = this.add.circle(0, 0, 40);
-		this.circle.setStrokeStyle(3, 0x000000);
-		this.circle.setOrigin(-1.01, -10.3);
-		this.circle.setDepth(1);
-		this.circle.setInteractive({ cursor: "pointer" });
+		this.tweens.add({
+			targets: start,
+			alpha: 0,
+			ease: "Cubic.easeOut",
+			duration: 900,
+			repeat: -1,
+			yoyo: true,
+		});
 
-		this.circle2 = this.add.circle(0, 0, 40);
-		this.circle2.setStrokeStyle(3, 0x000000);
-		this.circle2.setOrigin(-6.01, -10.3);
-		this.circle2.setDepth(1);
-		this.circle2.setInteractive({ cursor: "pointer" });
+		const circle = this.add.circle(0, 0, 40);
+		circle.setStrokeStyle(3, 0x000000);
+		circle.setOrigin(-1.01, -10.3);
+		circle.setDepth(2);
+		circle.setInteractive({ cursor: "pointer" });
 
-		this.trophy = this.add.image(0, 0, "trophy");
-		this.trophy.setOrigin(-2.7, -17.9);
+		const circle2 = this.add.circle(0, 0, 40);
+		circle2.setStrokeStyle(3, 0x000000);
+		circle2.setOrigin(-6.01, -10.3);
+		circle2.setDepth(2);
+		circle2.setInteractive({ cursor: "pointer" });
+
+		const trophy = this.add.image(0, 0, "trophy");
+		trophy.setOrigin(-2.7, -17.9);
 
 		this.rock = this.add.image(0, 0, "rock");
 		this.rock.setOrigin(-11.9, -20);
+
+		circle.on("pointerover", function (event) {
+			circle.setStrokeStyle(3, 0xffffff);
+		});
+		circle.on("pointerout", function (event) {
+			circle.setStrokeStyle(3, 0x000000);
+		});
+
+		circle2.on("pointerover", function (event) {
+			circle2.setStrokeStyle(3, 0xffffff);
+		});
+		circle2.on("pointerout", function (event) {
+			circle2.setStrokeStyle(3, 0x000000);
+		});
+
+		const rectStart = this.add.rectangle(
+			config.width / 2,
+			config.height / 2,
+			config.width,
+			config.height
+		);
+		rectStart.setInteractive();
+		rectStart.on(
+			"pointerdown",
+			function (event) {
+				this.scene.start("playGame");
+			},
+			this
+		);
 	}
 }
