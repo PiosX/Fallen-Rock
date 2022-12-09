@@ -125,5 +125,7 @@ class Title extends Phaser.Scene {
 			},
 			this
 		);
+		this.aGrid = new AlignGrid({ scene: this, rows: 30, cols: 11 });
+		this.aGrid.showNumbers();
 	}
 }
