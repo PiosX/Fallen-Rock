@@ -3,12 +3,12 @@ var config = {
 	height: window.innerHeight,
 	backgroundColor: 0xe63946,
 	scene: [Title, Game],
+	scale: { mode: Phaser.Scale.FIT },
 	physics: {
 		default: "arcade",
 		arcade: {
 			debug: true,
 		},
-		gravity: 200,
 	},
 };
 
