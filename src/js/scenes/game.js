@@ -66,11 +66,24 @@ class Game extends Phaser.Scene {
 			.sprite(config.width / 2, config.height / 2 - 130, "player")
 			.setGravityY(800);
 		this.player.setCollideWorldBounds(true);
+		this.numPlayer = this.make
+			.text({
+				x: config.width / 2,
+				y: config.height / 2 - 130,
+				text: "20",
+				style: {
+					font: "800 18px Nunito",
+					fontSize: "18px",
+					fontFamily: "Nunito",
+					fill: "#1e1e1e",
+				},
+			})
+			.setOrigin(0, 0);
 
 		this.block1 = this.add
 			.rectangle(
 				config.width / 5 - 2,
-				config.height / 2 + 33,
+				config.height / 1.1 + 33,
 				config.width / 5 - 4,
 				33,
 				0x1e1e1e
@@ -80,7 +93,7 @@ class Game extends Phaser.Scene {
 		this.block2 = this.add
 			.rectangle(
 				config.width / 5 + 2,
-				config.height / 2,
+				config.height / 1.1,
 				config.width / 5 - 4,
 				33,
 				0x1e1e1e
@@ -89,7 +102,7 @@ class Game extends Phaser.Scene {
 		this.block3 = this.add
 			.rectangle(
 				(2 * config.width) / 5 + 2,
-				config.height / 2,
+				config.height / 1.1,
 				config.width / 5 - 4,
 				33,
 				0x1e1e1e
@@ -98,7 +111,7 @@ class Game extends Phaser.Scene {
 		this.block4 = this.add
 			.rectangle(
 				(3 * config.width) / 5 + 2,
-				config.height / 2,
+				config.height / 1.1,
 				config.width / 5 - 4,
 				33,
 				0x1e1e1e
@@ -107,7 +120,7 @@ class Game extends Phaser.Scene {
 		this.block5 = this.add
 			.rectangle(
 				(4 * config.width) / 5 + 2,
-				config.height / 2,
+				config.height / 1.1,
 				config.width / 5 - 4,
 				33,
 				0x1e1e1e
@@ -121,8 +134,14 @@ class Game extends Phaser.Scene {
 		this.physics.add.existing(this.block5);
 
 		//NUMBERS
+		this.randNum1 = Math.floor(Math.random() * 48) + 1;
+		this.randNum2 = Math.floor(Math.random() * 48) + 1;
+		this.randNum3 = Math.floor(Math.random() * 48) + 1;
+		this.randNum4 = Math.floor(Math.random() * 48) + 1;
+		this.randNum5 = Math.floor(Math.random() * 48) + 1;
+
 		this.num1 = this.make.text({
-			text: "48",
+			text: this.randNum1,
 			style: {
 				font: "800 18px Nunito",
 				fill: "#ffffff",
@@ -133,7 +152,7 @@ class Game extends Phaser.Scene {
 			.text({
 				x: (3 * this.block2.width) / 2,
 				y: this.block2.y,
-				text: "4833",
+				text: this.randNum2,
 				style: {
 					font: "800 18px Nunito",
 					fill: "#ffffff",
@@ -144,7 +163,7 @@ class Game extends Phaser.Scene {
 			.text({
 				x: (5 * this.block2.width) / 2 + 4,
 				y: this.block2.y,
-				text: "48990",
+				text: this.randNum3,
 				style: {
 					font: "800 18px Nunito",
 					fill: "#ffffff",
@@ -155,7 +174,7 @@ class Game extends Phaser.Scene {
 			.text({
 				x: (7 * this.block2.width) / 2 + 8,
 				y: this.block2.y,
-				text: "48",
+				text: this.randNum4,
 				style: {
 					font: "800 18px Nunito",
 					fill: "#ffffff",
@@ -166,7 +185,7 @@ class Game extends Phaser.Scene {
 			.text({
 				x: (9 * this.block2.width) / 2 + 12,
 				y: this.block2.y,
-				text: "48",
+				text: this.randNum5,
 				style: {
 					font: "800 18px Nunito",
 					fill: "#ffffff",
@@ -174,11 +193,11 @@ class Game extends Phaser.Scene {
 			})
 			.setOrigin(0, 0);
 
-		this.physics.add.existing(this.num1);
-		this.physics.add.existing(this.num2);
-		this.physics.add.existing(this.num3);
-		this.physics.add.existing(this.num4);
-		this.physics.add.existing(this.num5);
+		// this.physics.add.existing(this.num1);
+		// this.physics.add.existing(this.num2);
+		// this.physics.add.existing(this.num3);
+		// this.physics.add.existing(this.num4);
+		// this.physics.add.existing(this.num5);
 
 		this.checkLeft = 0;
 		this.checkRight = 0;
@@ -231,6 +250,8 @@ class Game extends Phaser.Scene {
 		this.blockGroup.add(this.numberGroup3);
 		this.blockGroup.add(this.numberGroup4);
 		this.blockGroup.add(this.numberGroup5);
+
+		this.timer = 0;
 	}
 
 	// moveBlocks(block, speed) {
@@ -244,9 +265,12 @@ class Game extends Phaser.Scene {
 
 	resetBlockPos(block) {
 		block.getChildren()[0].y = config.height + 33;
+		if (block.getChildren()[0].x > config.width)
+			block.getChildren()[0].x -= config.width;
 	}
 
-	update() {
+	update(time, delta) {
+		this.timer += delta;
 		if (this.cursors.left.isDown) {
 			this.player.x -= 8;
 		}
@@ -270,6 +294,7 @@ class Game extends Phaser.Scene {
 		if (this.blockGroup.getChildren()[0].getChildren()[0].y < -33) {
 			this.resetBlockPos(this.blockGroup.getChildren()[0]);
 			this.randSpeed1 = Math.floor(Math.random() * (-150 + -100)) + -100;
+			this.num1.text = Math.floor(Math.random() * 48) + 1;
 			this.blockGroup.getChildren()[0].getChildren()[0].body.velocity.y =
 				this.randSpeed1;
 		}
@@ -278,6 +303,7 @@ class Game extends Phaser.Scene {
 		if (this.blockGroup.getChildren()[1].getChildren()[0].y < -33) {
 			this.resetBlockPos(this.blockGroup.getChildren()[1]);
 			this.randSpeed2 = Math.floor(Math.random() * (-150 + -100)) + -100;
+			this.num2.text = Math.floor(Math.random() * 48) + 1;
 			this.blockGroup.getChildren()[1].getChildren()[0].body.velocity.y =
 				this.randSpeed2;
 		}
@@ -286,6 +312,7 @@ class Game extends Phaser.Scene {
 		if (this.blockGroup.getChildren()[2].getChildren()[0].y < -33) {
 			this.resetBlockPos(this.blockGroup.getChildren()[2]);
 			this.randSpeed3 = Math.floor(Math.random() * (-150 + -100)) + -100;
+			this.num3.text = Math.floor(Math.random() * 48) + 1;
 			this.blockGroup.getChildren()[2].getChildren()[0].body.velocity.y =
 				this.randSpeed3;
 		}
@@ -294,6 +321,7 @@ class Game extends Phaser.Scene {
 		if (this.blockGroup.getChildren()[3].getChildren()[0].y < -33) {
 			this.resetBlockPos(this.blockGroup.getChildren()[3]);
 			this.randSpeed4 = Math.floor(Math.random() * (-150 + -100)) + -100;
+			this.num4.text = Math.floor(Math.random() * 48) + 1;
 			this.blockGroup.getChildren()[3].getChildren()[0].body.velocity.y =
 				this.randSpeed4;
 		}
@@ -302,15 +330,10 @@ class Game extends Phaser.Scene {
 		if (this.blockGroup.getChildren()[4].getChildren()[0].y < -33) {
 			this.resetBlockPos(this.blockGroup.getChildren()[4]);
 			this.randSpeed5 = Math.floor(Math.random() * (-150 + -100)) + -100;
+			this.num5.text = Math.floor(Math.random() * 48) + 1;
 			this.blockGroup.getChildren()[4].getChildren()[0].body.velocity.y =
 				this.randSpeed5;
 		}
-
-		// this.moveBlocks(this.blockGroup.getChildren()[0], this.randSpeed1);
-		// this.moveBlocks(this.blockGroup.getChildren()[1], this.randSpeed2);
-		// this.moveBlocks(this.blockGroup.getChildren()[2], this.randSpeed3);
-		// this.moveBlocks(this.blockGroup.getChildren()[3], this.randSpeed4);
-		// this.moveBlocks(this.blockGroup.getChildren()[4], this.randSpeed5);
 
 		this.blockGroup.getChildren().forEach((block) => {
 			for (let i = 0; i < block.getChildren().length; i++) {
@@ -318,8 +341,21 @@ class Game extends Phaser.Scene {
 					this.player,
 					block.getChildren()[0],
 					() => {
-						block.getChildren()[0].body.velocity.y = 0;
-						block.getChildren()[0].alpha = 0;
+						if (
+							this.timer > 800 &&
+							this.numPlayer.text > 0 &&
+							block.getChildren()[1].text > 0
+						) {
+							this.numPlayer.text -= 1;
+							block.getChildren()[1].text -= 1;
+							this.timer -= 800;
+						}
+						if (block.getChildren()[1].text == 0) {
+							block.getChildren()[0].x += config.width;
+						}
+
+						// block.getChildren()[0].body.velocity.y = 0;
+						// block.getChildren()[0].alpha = 0;
 						Phaser.Display.Align.In.Center(
 							block.getChildren()[1],
 							block.getChildren()[0]
@@ -334,5 +370,6 @@ class Game extends Phaser.Scene {
 		Phaser.Display.Align.In.Center(this.num3, this.block3);
 		Phaser.Display.Align.In.Center(this.num4, this.block4);
 		Phaser.Display.Align.In.Center(this.num5, this.block5);
+		Phaser.Display.Align.In.Center(this.numPlayer, this.player, 0, -55);
 	}
 }
