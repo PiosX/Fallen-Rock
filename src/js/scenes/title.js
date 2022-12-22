@@ -73,7 +73,7 @@ class Title extends Phaser.Scene {
 		this.tweens.add({
 			targets: start,
 			alpha: 0,
-			ease: "Cubic.easeOut",
+			ease: "linear",
 			duration: 900,
 			repeat: -1,
 			yoyo: true,

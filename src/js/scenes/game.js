@@ -4,7 +4,13 @@ class Game extends Phaser.Scene {
 	}
 
 	preload() {
-		this.load.svg("player", "dist/img/player.svg");
+		this.load.image("player", "dist/img/grey_rock.png");
+		this.load.svg("score", "dist/img/score.svg");
+		this.load.svg("heart", "dist/img/heart.svg");
+		this.load.spritesheet("bubble", "dist/img/bubble.png", {
+			frameWidth: 512,
+			frameHeight: 512,
+		});
 		this.blockGroup = this.add.group();
 		this.numberGroup1 = this.add.group();
 		this.numberGroup2 = this.add.group();
@@ -22,6 +28,7 @@ class Game extends Phaser.Scene {
 		this.randSpeed3 = Math.floor(Math.random() * (-150 + -100)) + -100;
 		this.randSpeed4 = Math.floor(Math.random() * (-150 + -100)) + -100;
 		this.randSpeed5 = Math.floor(Math.random() * (-150 + -100)) + -100;
+		this.randSpeed6 = Math.floor(Math.random() * (-150 + -100)) + -100;
 
 		this.progress = this.add.rectangle(
 			config.width / 2,
@@ -64,7 +71,8 @@ class Game extends Phaser.Scene {
 
 		this.player = this.physics.add
 			.sprite(config.width / 2, config.height / 2 - 130, "player")
-			.setGravityY(800);
+			.setGravityY(800)
+			.setScale(0.4);
 		this.player.setCollideWorldBounds(true);
 		this.numPlayer = this.make
 			.text({
@@ -79,6 +87,29 @@ class Game extends Phaser.Scene {
 				},
 			})
 			.setOrigin(0, 0);
+
+		this.bubble = this.physics.add
+			.sprite(config.width / 2, config.height + 33, "bubble")
+			.setScale(0.08);
+		this.bubble.body.immovable = true;
+
+		this.bubbleAnim = this.anims.create({
+			key: "bubbleAnim",
+			frames: this.anims.generateFrameNumbers("bubble"),
+			frameRate: 24,
+			repeat: 0,
+			hideOnComplete: true,
+		});
+
+		this.randBubbleNum = Math.floor(Math.random() * 10) + 1;
+		this.bubbleNumber = this.make.text({
+			text: this.randBubbleNum,
+			style: {
+				font: "800 18px Nunito",
+				fill: "#000",
+			},
+		});
+		this.bubble.body.velocity.y = this.randSpeed6;
 
 		this.block1 = this.add
 			.rectangle(
@@ -252,16 +283,193 @@ class Game extends Phaser.Scene {
 		this.blockGroup.add(this.numberGroup5);
 
 		this.timer = 0;
+		this.copyTimer = 0;
+		this.gameOverChecker = 0;
+
+		this.borderU = this.add.rectangle(config.width / 2, 0, config.width, 1);
+		this.borderD = this.add.rectangle(
+			config.width / 2,
+			config.height - 1,
+			config.width,
+			1
+		);
+		this.physics.add.existing(this.borderU);
+		this.physics.add.existing(this.borderD);
+
+		this.physics.add.collider(this.player, this.borderU, () => {
+			if (this.gameOverChecker == 0) {
+				this.gameOver();
+				this.gameOverChecker = 1;
+				this.player.destroy();
+				this.numPlayer.alpha = 0;
+			}
+		});
+		this.physics.add.collider(this.player, this.borderD, () => {
+			if (this.gameOverChecker == 0) {
+				this.gameOver();
+				this.gameOverChecker = 1;
+				this.player.destroy();
+				this.numPlayer.alpha = 0;
+			}
+		});
 	}
 
-	// moveBlocks(block, speed) {
-	// 	block.getChildren()[0].body.velocity.y = speed;
-	// 	if (block.getChildren()[0].y < -33) {
-	// 		this.resetBlockPos(block);
-	// 		speed = Math.floor(Math.random() * (-150 + -100)) + -100;
-	// 		block.getChildren()[0].body.velocity.y = speed;
-	// 	}
-	// }
+	gameOver() {
+		this.borderOver = this.add.graphics();
+		this.borderOver
+			.fillRoundedRect(
+				config.width / 7,
+				config.height / 7,
+				config.width / 1.4,
+				config.height / 2.9,
+				20
+			)
+			.fillStyle(0xff00ff, 1);
+
+		this.gameOverText = this.make
+			.text({
+				x: config.width / 2,
+				y: config.height / 5.2,
+				text: "Game Over",
+				style: {
+					font: "800 55px Nunito",
+					fill: "#ffffff",
+				},
+			})
+			.setOrigin(0.5, 0.5);
+		this.bestScore = this.make
+			.text({
+				x: config.width / 1.95,
+				y: config.height / 3.8,
+				text: "Best Score:",
+				style: {
+					font: "800 30px Nunito",
+					fill: "#ffffff",
+				},
+			})
+			.setOrigin(0.5, 0.5);
+		this.bestScoreNum = this.make
+			.text({
+				x: config.width / 2,
+				y: config.height / 3.2,
+				text: "152",
+				style: {
+					font: "800 25px Nunito",
+					fill: "#ffffff",
+				},
+			})
+			.setOrigin(0.5, 0.5);
+		this.score = this.make
+			.text({
+				x: config.width / 2,
+				y: config.height / 2.6,
+				text: "Score:",
+				style: {
+					font: "800 30px Nunito",
+					fill: "#ffffff",
+				},
+			})
+			.setOrigin(0.5, 0.5);
+		this.scoreNum = this.make
+			.text({
+				x: config.width / 2,
+				y: config.height / 2.3,
+				text: "44",
+				style: {
+					font: "800 25px Nunito",
+					fill: "#ffffff",
+				},
+			})
+			.setOrigin(0.5, 0.5);
+		this.continue = this.make
+			.text({
+				x: config.width / 2,
+				y: config.height / 1.55,
+				text: "Tap to continue",
+				style: {
+					font: "800 24px Nunito",
+					fill: "#1E1E1E",
+				},
+			})
+			.setOrigin(0.5, 0.5);
+
+		this.tweens.add({
+			targets: this.continue,
+			alpha: 0,
+			ease: "linear",
+			duration: 900,
+			repeat: -1,
+			yoyo: true,
+		});
+
+		this.score = this.add.image(
+			config.width / 2.85,
+			config.height / 3.8,
+			"score"
+		);
+		this.score.setTintFill(0xffffff);
+
+		this.reviveCircle = this.add.circle(
+			config.width / 2,
+			config.height / 1.205,
+			50
+		);
+		this.reviveCircle.setStrokeStyle(3, 0x000000);
+		this.reviveCircle.setDepth(20);
+		this.reviveCircle.setInteractive({ cursor: "pointer" });
+
+		this.revive = this.add.image(
+			config.width / 2,
+			config.height / 1.2,
+			"heart"
+		);
+
+		this.tweens.add({
+			targets: this.revive,
+			scaleX: 0.7,
+			scaleY: 0.7,
+			ease: "linear",
+			duration: 900,
+			repeat: -1,
+			yoyo: true,
+		});
+
+		this.reviveCircle.on("pointerover", () => {
+			this.reviveCircle.setStrokeStyle(3, 0xffffff);
+		});
+		this.reviveCircle.on("pointerout", () => {
+			this.reviveCircle.setStrokeStyle(3, 0x000000);
+		});
+
+		this.reviveText = this.make
+			.text({
+				x: config.width / 2,
+				y: config.height / 1.1,
+				text: "Revive?",
+				style: {
+					font: "800 24px Nunito",
+					fill: "#000000",
+				},
+			})
+			.setOrigin(0.5, 0.5);
+
+		this.retry = this.add
+			.rectangle(
+				config.width / 2,
+				config.height / 2,
+				config.width,
+				config.height
+			)
+			.setDepth(15);
+		this.retry.setInteractive();
+		this.retry.on(
+			"pointerdown",
+			function (event) {
+				this.scene.start("bootGame");
+			},
+			this
+		);
+	}
 
 	resetBlockPos(block) {
 		block.getChildren()[0].y = config.height + 33;
@@ -271,17 +479,34 @@ class Game extends Phaser.Scene {
 
 	update(time, delta) {
 		this.timer += delta;
+		this.copyTimer += delta;
+		this.bubbleFlag = 0;
+
+		if (this.bubble.body.y < -33) {
+			this.bubbleFlag = 0;
+			this.bubbleNumber.text = Math.floor(Math.random() * 10) + 1;
+			this.bubble.body.velocity.y =
+				Math.floor(Math.random() * (-150 + -100)) + -100;
+			this.bubble.body.x =
+				Math.floor(Math.random() * config.width - 20) + 20;
+			this.bubble.body.y = config.height + 33;
+		}
+
 		if (this.cursors.left.isDown) {
 			this.player.x -= 8;
+			this.player.angle -= 10;
 		}
 		if (this.cursors.right.isDown) {
 			this.player.x += 8;
+			this.player.angle += 10;
 		}
 		if (this.input.activePointer.isDown && this.checkLeft === 1) {
 			this.player.x -= 8;
+			this.player.angle -= 10;
 		}
 		if (this.input.activePointer.isDown && this.checkRight === 1) {
 			this.player.x += 8;
+			this.player.angle += 10;
 		}
 		// if (this.game.input.mousePointer.isDown) {
 		// 	this.player.setPosition(
@@ -348,10 +573,15 @@ class Game extends Phaser.Scene {
 						) {
 							this.numPlayer.text -= 1;
 							block.getChildren()[1].text -= 1;
-							this.timer -= 800;
+							this.timer = 0;
 						}
 						if (block.getChildren()[1].text == 0) {
 							block.getChildren()[0].x += config.width;
+						}
+						if (this.numPlayer.text == 0) {
+							this.player.destroy();
+							this.numPlayer.alpha = 0;
+							this.gameOver();
 						}
 
 						// block.getChildren()[0].body.velocity.y = 0;
@@ -364,6 +594,17 @@ class Game extends Phaser.Scene {
 				);
 			}
 		});
+		let bubbleValue = parseInt(this.bubbleNumber.text);
+		let playerValue = parseInt(this.numPlayer.text);
+		this.countValues = parseInt(playerValue) + parseInt(bubbleValue);
+
+		this.physics.add.overlap(this.player, this.bubble, () => {
+			if (this.bubbleFlag == 0) {
+				this.bubble.x = config.width + 100;
+				this.numPlayer.text = this.countValues;
+				this.bubbleFlag = 1;
+			}
+		});
 
 		Phaser.Display.Align.In.Center(this.num1, this.block1);
 		Phaser.Display.Align.In.Center(this.num2, this.block2);
@@ -371,5 +612,6 @@ class Game extends Phaser.Scene {
 		Phaser.Display.Align.In.Center(this.num4, this.block4);
 		Phaser.Display.Align.In.Center(this.num5, this.block5);
 		Phaser.Display.Align.In.Center(this.numPlayer, this.player, 0, -55);
+		Phaser.Display.Align.In.Center(this.bubbleNumber, this.bubble);
 	}
 }
