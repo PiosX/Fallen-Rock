@@ -4,7 +4,7 @@ class Game extends Phaser.Scene {
 	}
 
 	preload() {
-		this.load.image("player", "dist/img/grey_rock.png");
+		this.load.svg("player", "dist/img/player.svg");
 		this.load.svg("score", "dist/img/score.svg");
 		this.load.svg("heart", "dist/img/heart.svg");
 		this.load.spritesheet("bubble", "dist/img/bubble.png", {
@@ -30,50 +30,57 @@ class Game extends Phaser.Scene {
 		this.randSpeed5 = Math.floor(Math.random() * (-150 + -100)) + -100;
 		this.randSpeed6 = Math.floor(Math.random() * (-150 + -100)) + -100;
 
-		this.progress = this.add.rectangle(
-			config.width / 2,
-			40,
-			120,
-			8,
-			0xffffff
-		);
-		this.progress.setDepth(1);
+		this.levelTime = 25000;
 
-		this.currLevel = this.add.graphics();
-		this.currLevel.fillStyle(0x000000, 1);
-		this.currLevel.fillRoundedRect(config.width / 2 - 90, 25, 30, 30, 10);
-		this.currLevel.setDepth(2);
+		this.flagFinish = 0;
+		this.currLevel = 1;
+		this.nextLevel = this.currLevel + 1;
+
+		this.scorePoints = 0;
+		this.bestScorePoints = 0;
+		this.scoreFlag = 0;
+
+		this.graph = this.add.graphics();
+
 		this.currLevelText = this.make
 			.text({
-				text: "1",
+				x: config.width / 2 - 120,
+				y: 38,
+				text:
+					parseInt(localStorage.getItem("currLevel")) ||
+					this.currLevel,
 				style: {
 					font: "800 18px Nunito",
 					fill: "#FFFFFF",
 				},
 			})
-			.setOrigin(-21.8, -1.4)
+			.setOrigin(0.5, 0.5)
 			.setDepth(3);
 
-		this.nextLevel = this.add.graphics();
-		this.nextLevel.fillStyle(0xffffff, 1);
-		this.nextLevel.fillRoundedRect(config.width / 2 + 60, 25, 30, 30, 10);
-		this.nextLevel.setDepth(2);
 		this.nextLevelText = this.make
 			.text({
-				text: "2",
+				x: config.width / 2 + 120,
+				y: 38,
+				text: localStorage.getItem("nextLevel") || this.nextLevel,
 				style: {
 					font: "800 18px Nunito",
-					fill: "#000000",
+					fill: "#ffffff",
 				},
 			})
-			.setOrigin(-35.4, -1.4)
+			.setOrigin(0.5, 0.5)
 			.setDepth(3);
+
+		this.finishLine = this.add
+			.rectangle(0, config.height + 33, config.width, 2, 0xffffff)
+			.setOrigin(0, 0);
+		this.physics.add.existing(this.finishLine);
 
 		this.player = this.physics.add
 			.sprite(config.width / 2, config.height / 2 - 130, "player")
 			.setGravityY(800)
-			.setScale(0.4);
+			.setScale(0.8);
 		this.player.setCollideWorldBounds(true);
+
 		this.numPlayer = this.make
 			.text({
 				x: config.width / 2,
@@ -302,6 +309,22 @@ class Game extends Phaser.Scene {
 				this.gameOverChecker = 1;
 				this.player.destroy();
 				this.numPlayer.alpha = 0;
+				if (
+					this.bestScorePoints == 0 &&
+					parseInt(localStorage.getItem("scorePoints") == NaN)
+				) {
+					localStorage.removeItem("scorePoints");
+					this.bestScorePoints = this.scorePoints;
+					localStorage.setItem("scorePoints", this.bestScorePoints);
+				}
+				if (
+					parseInt(localStorage.getItem("scorePoints")) <
+					this.scorePoints
+				) {
+					localStorage.removeItem("scorePoints");
+					this.bestScorePoints = this.scorePoints;
+					localStorage.setItem("scorePoints", this.bestScorePoints);
+				}
 			}
 		});
 		this.physics.add.collider(this.player, this.borderD, () => {
@@ -310,8 +333,58 @@ class Game extends Phaser.Scene {
 				this.gameOverChecker = 1;
 				this.player.destroy();
 				this.numPlayer.alpha = 0;
+				if (
+					this.bestScorePoints == 0 &&
+					parseInt(localStorage.getItem("scorePoints") == NaN)
+				) {
+					localStorage.removeItem("scorePoints");
+					this.bestScorePoints = this.scorePoints;
+					localStorage.setItem("scorePoints", this.bestScorePoints);
+				}
+				if (
+					parseInt(localStorage.getItem("scorePoints")) <
+					this.scorePoints
+				) {
+					localStorage.removeItem("scorePoints");
+					this.bestScorePoints = this.scorePoints;
+					localStorage.setItem("scorePoints", this.bestScorePoints);
+				}
 			}
 		});
+
+		this.physics.add.collider(this.player, this.finishLine, () => {
+			this.currLevel = parseInt(localStorage.getItem("currLevel")) + 1;
+			this.nextLevel = this.currLevel + 1;
+			this.levelTime = parseInt(localStorage.getItem("levelTime")) + 1000;
+
+			localStorage.removeItem("levelTime");
+			localStorage.removeItem("currLevel");
+			localStorage.removeItem("nextLevel");
+			localStorage.setItem("currLevel", this.currLevel);
+			localStorage.setItem("nextLevel", this.nextLevel);
+			localStorage.setItem("levelTime", this.levelTime);
+			this.scene.start("bootGame");
+		});
+
+		this.progressBar = this.add
+			.rectangle(config.width / 2, 40, config.width / 5, 4, 0x000000)
+			.setDepth(1)
+			.setScale(0, 1);
+
+		this.progressAnim = this.tweens.add({
+			targets: this.progressBar,
+			scaleX: 1,
+			ease: "linear",
+			duration: localStorage.getItem("levelTime") || this.levelTime,
+			repeat: 0,
+			onComplete: this.finish(),
+		});
+	}
+
+	finish() {
+		setTimeout(() => {
+			this.flagFinish = 1;
+		}, localStorage.getItem("levelTime") || this.levelTime);
 	}
 
 	gameOver() {
@@ -352,7 +425,8 @@ class Game extends Phaser.Scene {
 			.text({
 				x: config.width / 2,
 				y: config.height / 3.2,
-				text: "152",
+				text:
+					localStorage.getItem("scorePoints") || this.bestScorePoints,
 				style: {
 					font: "800 25px Nunito",
 					fill: "#ffffff",
@@ -374,7 +448,7 @@ class Game extends Phaser.Scene {
 			.text({
 				x: config.width / 2,
 				y: config.height / 2.3,
-				text: "44",
+				text: this.scorePoints,
 				style: {
 					font: "800 25px Nunito",
 					fill: "#ffffff",
@@ -480,6 +554,7 @@ class Game extends Phaser.Scene {
 	update(time, delta) {
 		this.timer += delta;
 		this.copyTimer += delta;
+		this.pointTimer = this.copyTimer;
 		this.bubbleFlag = 0;
 
 		if (this.bubble.body.y < -33) {
@@ -508,12 +583,17 @@ class Game extends Phaser.Scene {
 			this.player.x += 8;
 			this.player.angle += 10;
 		}
-		// if (this.game.input.mousePointer.isDown) {
-		// 	this.player.setPosition(
-		// 		game.input.mousePointer.x,
-		// 		config.height / 2 - 130
-		// 	);
-		// }
+
+		if (
+			this.pointTimer > 300 &&
+			this.scoreFlag == 0 &&
+			this.gameOverChecker == 0
+		) {
+			this.scorePoints++;
+			console.log(this.scorePoints);
+			this.pointTimer = 0;
+		}
+
 		this.blockGroup.getChildren()[0].getChildren()[0].body.velocity.y =
 			this.randSpeed1;
 		if (this.blockGroup.getChildren()[0].getChildren()[0].y < -33) {
@@ -583,17 +663,19 @@ class Game extends Phaser.Scene {
 							this.numPlayer.alpha = 0;
 							this.gameOver();
 						}
-
+						this.scoreFlag = 1;
 						// block.getChildren()[0].body.velocity.y = 0;
 						// block.getChildren()[0].alpha = 0;
 						Phaser.Display.Align.In.Center(
 							block.getChildren()[1],
 							block.getChildren()[0]
 						);
-					}
+					},
+					(this.scoreFlag = 0)
 				);
 			}
 		});
+
 		let bubbleValue = parseInt(this.bubbleNumber.text);
 		let playerValue = parseInt(this.numPlayer.text);
 		this.countValues = parseInt(playerValue) + parseInt(bubbleValue);
@@ -605,6 +687,10 @@ class Game extends Phaser.Scene {
 				this.bubbleFlag = 1;
 			}
 		});
+
+		if (this.flagFinish == 1) {
+			this.finishLine.body.velocity.y = -100;
+		}
 
 		Phaser.Display.Align.In.Center(this.num1, this.block1);
 		Phaser.Display.Align.In.Center(this.num2, this.block2);

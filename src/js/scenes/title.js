@@ -11,6 +11,9 @@ class Title extends Phaser.Scene {
 	}
 
 	create() {
+		if (localStorage.getItem("currLevel") == null) {
+			localStorage.setItem("currLevel", 1);
+		}
 		this.make
 			.text({
 				text: "Fallen",
@@ -31,13 +34,15 @@ class Title extends Phaser.Scene {
 			.setOrigin(-1.06, -2.6);
 		this.make
 			.text({
-				text: "Level 1",
+				x: config.width / 2,
+				y: 45,
+				text: "Level " + localStorage.getItem("currLevel"),
 				style: {
 					font: "800 30px Nunito",
 					fill: "0x000000",
 				},
 			})
-			.setOrigin(-2.85, -0.8);
+			.setOrigin(0.5, 0.5);
 
 		const settings = this.add.image(20, 20, "settings");
 		settings.setOrigin(0, 0);
@@ -49,13 +54,15 @@ class Title extends Phaser.Scene {
 
 		this.make
 			.text({
-				text: "152",
+				x: config.width / 2 + 30,
+				y: config.height / 2 - 40,
+				text: localStorage.getItem("scorePoints") || 0,
 				style: {
 					font: "800 36px Nunito",
 					fill: "0x000000",
 				},
 			})
-			.setOrigin(-4.9, -10.1);
+			.setOrigin(0.5, 0.5);
 
 		const hero = this.add
 			.circle(config.width / 2, config.height / 2 + 130, 35, "0xffffff")
