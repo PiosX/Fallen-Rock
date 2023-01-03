@@ -4,13 +4,9 @@ class Game extends Phaser.Scene {
 	}
 
 	preload() {
-		this.load.svg("player", "dist/img/player.svg");
-		this.load.svg("score", "dist/img/score.svg");
-		this.load.svg("heart", "dist/img/heart.svg");
-		this.load.spritesheet("bubble", "dist/img/bubble.png", {
-			frameWidth: 512,
-			frameHeight: 512,
-		});
+		this.load.svg("player", localStorage.getItem("p"));
+		this.load.svg("score", localStorage.getItem("scr"));
+		this.load.svg("heart", localStorage.getItem("h"));
 		this.blockGroup = this.add.group();
 		this.numberGroup1 = this.add.group();
 		this.numberGroup2 = this.add.group();
@@ -20,6 +16,7 @@ class Game extends Phaser.Scene {
 	}
 
 	create() {
+		this.cameras.main.setBackgroundColor(localStorage.getItem("bgc"));
 		this.cursors = this.input.keyboard.createCursorKeys();
 		this.physics.world.setBoundsCollision();
 
@@ -51,7 +48,7 @@ class Game extends Phaser.Scene {
 					this.currLevel,
 				style: {
 					font: "800 18px Nunito",
-					fill: "#FFFFFF",
+					fill: localStorage.getItem("levels"),
 				},
 			})
 			.setOrigin(0.5, 0.5)
@@ -64,21 +61,27 @@ class Game extends Phaser.Scene {
 				text: localStorage.getItem("nextLevel") || this.nextLevel,
 				style: {
 					font: "800 18px Nunito",
-					fill: "#ffffff",
+					fill: localStorage.getItem("levels"),
 				},
 			})
 			.setOrigin(0.5, 0.5)
 			.setDepth(3);
 
 		this.finishLine = this.add
-			.rectangle(0, config.height + 33, config.width, 2, 0xffffff)
+			.rectangle(
+				0,
+				config.height + 33,
+				config.width,
+				2,
+				localStorage.getItem("player")
+			)
 			.setOrigin(0, 0);
 		this.physics.add.existing(this.finishLine);
 
 		this.player = this.physics.add
-			.sprite(config.width / 2, config.height / 2 - 130, "player")
+			.sprite(config.width / 2, 150, "player")
 			.setGravityY(800)
-			.setScale(0.8);
+			.setScale(0.7);
 		this.player.setCollideWorldBounds(true);
 
 		this.numPlayer = this.make
@@ -90,30 +93,22 @@ class Game extends Phaser.Scene {
 					font: "800 18px Nunito",
 					fontSize: "18px",
 					fontFamily: "Nunito",
-					fill: "#1e1e1e",
+					fill: localStorage.getItem("text"),
 				},
 			})
 			.setOrigin(0, 0);
 
 		this.bubble = this.physics.add
-			.sprite(config.width / 2, config.height + 33, "bubble")
-			.setScale(0.08);
+			.sprite(config.width / 2, config.height + 33, "player")
+			.setScale(0.4);
 		this.bubble.body.immovable = true;
-
-		this.bubbleAnim = this.anims.create({
-			key: "bubbleAnim",
-			frames: this.anims.generateFrameNumbers("bubble"),
-			frameRate: 24,
-			repeat: 0,
-			hideOnComplete: true,
-		});
 
 		this.randBubbleNum = Math.floor(Math.random() * 10) + 1;
 		this.bubbleNumber = this.make.text({
 			text: this.randBubbleNum,
 			style: {
 				font: "800 18px Nunito",
-				fill: "#000",
+				fill: localStorage.getItem("bbl"),
 			},
 		});
 		this.bubble.body.velocity.y = this.randSpeed6;
@@ -124,7 +119,7 @@ class Game extends Phaser.Scene {
 				config.height / 1.1 + 33,
 				config.width / 5 - 4,
 				33,
-				0x1e1e1e
+				localStorage.getItem("block")
 			)
 			.setOrigin(1, 1);
 
@@ -134,7 +129,7 @@ class Game extends Phaser.Scene {
 				config.height / 1.1,
 				config.width / 5 - 4,
 				33,
-				0x1e1e1e
+				localStorage.getItem("block")
 			)
 			.setOrigin(0, 0);
 		this.block3 = this.add
@@ -143,7 +138,7 @@ class Game extends Phaser.Scene {
 				config.height / 1.1,
 				config.width / 5 - 4,
 				33,
-				0x1e1e1e
+				localStorage.getItem("block")
 			)
 			.setOrigin(0, 0);
 		this.block4 = this.add
@@ -152,7 +147,7 @@ class Game extends Phaser.Scene {
 				config.height / 1.1,
 				config.width / 5 - 4,
 				33,
-				0x1e1e1e
+				localStorage.getItem("block")
 			)
 			.setOrigin(0, 0);
 		this.block5 = this.add
@@ -161,7 +156,7 @@ class Game extends Phaser.Scene {
 				config.height / 1.1,
 				config.width / 5 - 4,
 				33,
-				0x1e1e1e
+				localStorage.getItem("block")
 			)
 			.setOrigin(0, 0);
 
@@ -182,7 +177,7 @@ class Game extends Phaser.Scene {
 			text: this.randNum1,
 			style: {
 				font: "800 18px Nunito",
-				fill: "#ffffff",
+				fill: localStorage.getItem("revText"),
 			},
 		});
 
@@ -193,7 +188,7 @@ class Game extends Phaser.Scene {
 				text: this.randNum2,
 				style: {
 					font: "800 18px Nunito",
-					fill: "#ffffff",
+					fill: localStorage.getItem("revText"),
 				},
 			})
 			.setOrigin(0, 0);
@@ -204,7 +199,7 @@ class Game extends Phaser.Scene {
 				text: this.randNum3,
 				style: {
 					font: "800 18px Nunito",
-					fill: "#ffffff",
+					fill: localStorage.getItem("revText"),
 				},
 			})
 			.setOrigin(0, 0);
@@ -215,7 +210,7 @@ class Game extends Phaser.Scene {
 				text: this.randNum4,
 				style: {
 					font: "800 18px Nunito",
-					fill: "#ffffff",
+					fill: localStorage.getItem("revText"),
 				},
 			})
 			.setOrigin(0, 0);
@@ -226,7 +221,7 @@ class Game extends Phaser.Scene {
 				text: this.randNum5,
 				style: {
 					font: "800 18px Nunito",
-					fill: "#ffffff",
+					fill: localStorage.getItem("revText"),
 				},
 			})
 			.setOrigin(0, 0);
@@ -306,6 +301,7 @@ class Game extends Phaser.Scene {
 		this.physics.add.collider(this.player, this.borderU, () => {
 			if (this.gameOverChecker == 0) {
 				this.gameOver();
+				this.flagFinish = 0;
 				this.gameOverChecker = 1;
 				this.player.destroy();
 				this.numPlayer.alpha = 0;
@@ -330,6 +326,7 @@ class Game extends Phaser.Scene {
 		this.physics.add.collider(this.player, this.borderD, () => {
 			if (this.gameOverChecker == 0) {
 				this.gameOver();
+				this.flagFinish = 0;
 				this.gameOverChecker = 1;
 				this.player.destroy();
 				this.numPlayer.alpha = 0;
@@ -363,21 +360,71 @@ class Game extends Phaser.Scene {
 			localStorage.setItem("currLevel", this.currLevel);
 			localStorage.setItem("nextLevel", this.nextLevel);
 			localStorage.setItem("levelTime", this.levelTime);
+			if (
+				this.bestScorePoints == 0 &&
+				parseInt(localStorage.getItem("scorePoints") == NaN)
+			) {
+				localStorage.removeItem("scorePoints");
+				this.bestScorePoints = this.scorePoints;
+				localStorage.setItem("scorePoints", this.bestScorePoints);
+			}
+			if (
+				parseInt(localStorage.getItem("scorePoints")) < this.scorePoints
+			) {
+				localStorage.removeItem("scorePoints");
+				this.bestScorePoints = this.scorePoints;
+				localStorage.setItem("scorePoints", this.bestScorePoints);
+			}
+			this.flagFinish = 0;
+
+			this.getNumber = Math.floor(Math.random() * 7) + 1;
+			if (parseInt(localStorage.getItem("getNumCol")) != this.getNumber) {
+				localStorage.removeItem("getNumCol");
+				localStorage.setItem("getNumCol", this.getNumber);
+			} else {
+				if (this.getNumber <= 6) {
+					this.getNumber++;
+					localStorage.removeItem("getNumCol");
+					localStorage.setItem("getNumCol", this.getNumber);
+				} else {
+					this.getNumber = 1;
+					localStorage.removeItem("getNumCol");
+					localStorage.setItem("getNumCol", this.getNumber);
+				}
+			}
 			this.scene.start("bootGame");
+			window.location.reload();
 		});
 
 		this.progressBar = this.add
-			.rectangle(config.width / 2, 40, config.width / 5, 4, 0x000000)
+			.rectangle(
+				config.width / 2,
+				40,
+				config.width / 5,
+				4,
+				localStorage.getItem("darkerText")
+			)
 			.setDepth(1)
 			.setScale(0, 1);
 
-		this.progressAnim = this.tweens.add({
-			targets: this.progressBar,
-			scaleX: 1,
-			ease: "linear",
-			duration: localStorage.getItem("levelTime") || this.levelTime,
-			repeat: 0,
-			onComplete: this.finish(),
+		if (this.gameOverChecker == 0) {
+			this.progressAnim = this.tweens.add({
+				targets: this.progressBar,
+				scaleX: 1,
+				ease: "linear",
+				duration: localStorage.getItem("levelTime") || this.levelTime,
+				repeat: 0,
+				onComplete: this.finish(),
+			});
+		}
+		this.displayScore = this.make.text({
+			x: config.width / 1.2,
+			y: 23,
+			text: this.scorePoints,
+			style: {
+				font: "800 25px Nunito",
+				fill: localStorage.getItem("levels"),
+			},
 		});
 	}
 
@@ -397,7 +444,7 @@ class Game extends Phaser.Scene {
 				config.height / 2.9,
 				20
 			)
-			.fillStyle(0xff00ff, 1);
+			.fillStyle(localStorage.getItem("text"), 1);
 
 		this.gameOverText = this.make
 			.text({
@@ -406,7 +453,7 @@ class Game extends Phaser.Scene {
 				text: "Game Over",
 				style: {
 					font: "800 55px Nunito",
-					fill: "#ffffff",
+					fill: localStorage.getItem("revText"),
 				},
 			})
 			.setOrigin(0.5, 0.5);
@@ -417,7 +464,7 @@ class Game extends Phaser.Scene {
 				text: "Best Score:",
 				style: {
 					font: "800 30px Nunito",
-					fill: "#ffffff",
+					fill: localStorage.getItem("revText"),
 				},
 			})
 			.setOrigin(0.5, 0.5);
@@ -429,7 +476,7 @@ class Game extends Phaser.Scene {
 					localStorage.getItem("scorePoints") || this.bestScorePoints,
 				style: {
 					font: "800 25px Nunito",
-					fill: "#ffffff",
+					fill: localStorage.getItem("revText"),
 				},
 			})
 			.setOrigin(0.5, 0.5);
@@ -440,7 +487,7 @@ class Game extends Phaser.Scene {
 				text: "Score:",
 				style: {
 					font: "800 30px Nunito",
-					fill: "#ffffff",
+					fill: localStorage.getItem("revText"),
 				},
 			})
 			.setOrigin(0.5, 0.5);
@@ -451,7 +498,7 @@ class Game extends Phaser.Scene {
 				text: this.scorePoints,
 				style: {
 					font: "800 25px Nunito",
-					fill: "#ffffff",
+					fill: localStorage.getItem("revText"),
 				},
 			})
 			.setOrigin(0.5, 0.5);
@@ -462,7 +509,7 @@ class Game extends Phaser.Scene {
 				text: "Tap to continue",
 				style: {
 					font: "800 24px Nunito",
-					fill: "#1E1E1E",
+					fill: localStorage.getItem("text"),
 				},
 			})
 			.setOrigin(0.5, 0.5);
@@ -481,14 +528,13 @@ class Game extends Phaser.Scene {
 			config.height / 3.8,
 			"score"
 		);
-		this.score.setTintFill(0xffffff);
 
 		this.reviveCircle = this.add.circle(
 			config.width / 2,
 			config.height / 1.205,
 			50
 		);
-		this.reviveCircle.setStrokeStyle(3, 0x000000);
+		this.reviveCircle.setStrokeStyle(3, localStorage.getItem("block"));
 		this.reviveCircle.setDepth(20);
 		this.reviveCircle.setInteractive({ cursor: "pointer" });
 
@@ -509,10 +555,13 @@ class Game extends Phaser.Scene {
 		});
 
 		this.reviveCircle.on("pointerover", () => {
-			this.reviveCircle.setStrokeStyle(3, 0xffffff);
+			this.reviveCircle.setStrokeStyle(
+				3,
+				localStorage.getItem("playerCol")
+			);
 		});
 		this.reviveCircle.on("pointerout", () => {
-			this.reviveCircle.setStrokeStyle(3, 0x000000);
+			this.reviveCircle.setStrokeStyle(3, localStorage.getItem("block"));
 		});
 
 		this.reviveText = this.make
@@ -522,7 +571,7 @@ class Game extends Phaser.Scene {
 				text: "Revive?",
 				style: {
 					font: "800 24px Nunito",
-					fill: "#000000",
+					fill: localStorage.getItem("darkerText"),
 				},
 			})
 			.setOrigin(0.5, 0.5);
@@ -590,7 +639,7 @@ class Game extends Phaser.Scene {
 			this.gameOverChecker == 0
 		) {
 			this.scorePoints++;
-			console.log(this.scorePoints);
+			this.displayScore.text++;
 			this.pointTimer = 0;
 		}
 
@@ -664,8 +713,6 @@ class Game extends Phaser.Scene {
 							this.gameOver();
 						}
 						this.scoreFlag = 1;
-						// block.getChildren()[0].body.velocity.y = 0;
-						// block.getChildren()[0].alpha = 0;
 						Phaser.Display.Align.In.Center(
 							block.getChildren()[1],
 							block.getChildren()[0]
@@ -688,16 +735,22 @@ class Game extends Phaser.Scene {
 			}
 		});
 
-		if (this.flagFinish == 1) {
+		if (this.flagFinish == 1 && this.gameOverChecker == 0) {
 			this.finishLine.body.velocity.y = -100;
 		}
+		if (this.gameOverChecker == 1) {
+			this.progressAnim.restart();
+			this.progressAnim.stop();
+			this.finishLine.body.velocity.y = 0;
+			this.finishLine.body.y = config.height + 33;
+		}
 
-		Phaser.Display.Align.In.Center(this.num1, this.block1);
-		Phaser.Display.Align.In.Center(this.num2, this.block2);
-		Phaser.Display.Align.In.Center(this.num3, this.block3);
-		Phaser.Display.Align.In.Center(this.num4, this.block4);
-		Phaser.Display.Align.In.Center(this.num5, this.block5);
+		Phaser.Display.Align.In.Center(this.num1, this.block1, 0, -2.5);
+		Phaser.Display.Align.In.Center(this.num2, this.block2, 0, -2.5);
+		Phaser.Display.Align.In.Center(this.num3, this.block3, 0, -2.5);
+		Phaser.Display.Align.In.Center(this.num4, this.block4, 0, -2.5);
+		Phaser.Display.Align.In.Center(this.num5, this.block5, 0, -2.5);
 		Phaser.Display.Align.In.Center(this.numPlayer, this.player, 0, -55);
-		Phaser.Display.Align.In.Center(this.bubbleNumber, this.bubble);
+		Phaser.Display.Align.In.Center(this.bubbleNumber, this.bubble, 0, -4);
 	}
 }
