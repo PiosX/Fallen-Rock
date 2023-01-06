@@ -412,9 +412,10 @@ class Game extends Phaser.Scene {
 				targets: this.progressBar,
 				scaleX: 1,
 				ease: "linear",
-				duration: localStorage.getItem("levelTime") || this.levelTime,
+				duration:
+					parseInt(localStorage.getItem("levelTime")) ||
+					this.levelTime,
 				repeat: 0,
-				onComplete: this.finish(),
 			});
 		}
 		this.displayScore = this.make.text({
@@ -426,12 +427,12 @@ class Game extends Phaser.Scene {
 				fill: localStorage.getItem("levels"),
 			},
 		});
+
+		console.log(localStorage.getItem("levelTime"));
 	}
 
 	finish() {
-		setTimeout(() => {
-			this.flagFinish = 1;
-		}, localStorage.getItem("levelTime") || this.levelTime);
+		this.flagFinish = 1;
 	}
 
 	gameOver() {
@@ -743,6 +744,10 @@ class Game extends Phaser.Scene {
 			this.progressAnim.stop();
 			this.finishLine.body.velocity.y = 0;
 			this.finishLine.body.y = config.height + 33;
+		}
+
+		if (this.progressBar.scaleX == 1) {
+			this.finish();
 		}
 
 		Phaser.Display.Align.In.Center(this.num1, this.block1, 0, -2.5);

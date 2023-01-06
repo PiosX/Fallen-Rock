@@ -306,6 +306,5 @@ class Title extends Phaser.Scene {
 		localStorage.setItem("t", this.colorVariant.t);
 		localStorage.setItem("r", this.colorVariant.r);
 		localStorage.setItem("h", this.colorVariant.h);
-		console.log(localStorage.getItem("s"));
 	}
 }
